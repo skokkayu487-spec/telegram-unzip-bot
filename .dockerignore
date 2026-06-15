@@ -1,0 +1,11 @@
+node_modules
+.env
+downloads/
+temp/
+logs/
+data/
+*.log
+.DS_Store
+.git
+.gitignore
+README.md

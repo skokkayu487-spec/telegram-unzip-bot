@@ -1,0 +1,37 @@
+{
+  "name": "telegram-unzip-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for extracting .zip and .7z archives with MTProto support for large files",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "lint": "eslint src/",
+    "health": "node src/health.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "telegram": "^2.26.22",
+    "input": "^1.0.1",
+    "node-7z": "^3.0.0",
+    "adm-zip": "^0.5.16",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "node-schedule": "^2.1.1",
+    "fs-extra": "^11.2.0",
+    "mime-types": "^2.1.35",
+    "p-limit": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.18.0"
+  },
+  "keywords": ["telegram", "bot", "unzip", "7z", "mtproto"],
+  "author": "",
+  "license": "MIT"
+}

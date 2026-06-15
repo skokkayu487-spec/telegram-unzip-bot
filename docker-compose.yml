@@ -1,0 +1,112 @@
+name: telegram-unzip-bot
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: telegram-unzip-bot:latest
+    container_name: telegram-unzip-bot
+
+    # Auto restart unless explicitly stopped
+    restart: unless-stopped
+
+    # Load environment from .env file
+    env_file:
+      - .env
+
+    # Override env paths to use named volumes
+    environment:
+      - NODE_ENV=production
+      - DOWNLOADS_DIR=/data/downloads
+      - TEMP_DIR=/data/temp
+      - LOG_DIR=/data/logs
+      - DATA_DIR=/data/data
+      - 7Z_BIN=/usr/bin/7za
+      - TZ=Asia/Jakarta
+
+    # Persistent volumes
+    volumes:
+      # Archive downloads (persistent)
+      - bot_downloads:/data/downloads
+      # Temp extraction workspace (persistent across restarts if job is mid-flight)
+      - bot_temp:/data/temp
+      # Log files (persistent)
+      - bot_logs:/data/logs
+      # Bot data: stats, session, health (persistent)
+      - bot_data:/data/data
+      # Assets: menu.jpg, success.jpg
+      - ./assets:/app/assets:ro
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+    # Health check (matches Dockerfile HEALTHCHECK)
+    healthcheck:
+      test: ["CMD", "node", "/app/src/health.js"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem (data goes to volumes)
+    # read_only: true   # Uncomment if all writes go to volumes
+    tmpfs:
+      - /tmp:noexec,nosuid,size=512m
+
+    # Network
+    networks:
+      - bot_net
+
+# Named volumes for data persistence
+volumes:
+  bot_downloads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./downloads
+
+  bot_temp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./temp
+
+  bot_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logs
+
+  bot_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data
+
+networks:
+  bot_net:
+    driver: bridge
